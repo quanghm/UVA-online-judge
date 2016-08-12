@@ -1,198 +1,157 @@
 /*
- * 763.cpp
+ * =====================================================================================
  *
- *  Created on: May 14, 2015
- *      Author: quanghoang
+ *       Filename:  763.cpp
+ *
+ *    Description:  Fibinary Numbers
+ *
+ *        Version:  1.0
+ *        Created:  08/05/2016 21:17:29
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Quang Hoang (QH), quanghm@gmail.com
+ *   Organization:  
+ *
+ * =====================================================================================
  */
 
 #include <iostream>
-#include <string>
-#include<stdio.h>
+#include <cstdio>
+#include <vector>
 
 using namespace std;
 
-string s[2];
-void add(int i,int j){	// add at position i
-	int l=s[j].length()-1;
-	if (i<0){
-		s[j]='1'+s[j];
-		return;
-	}
-	if (s[j][i]==48){	// 0
-		if (s[j][i-1]==49){ //*10+1
-			s[j][i-1]=48;
-			add(i-2,j);
-			return;
-		}else{	// 00+1
-			if (i<l&&s[j][i+1]==49){//001+10
-				s[j][i]=48;s[j][i+1]=48;
-				add(i-1,j);
-				return;
-			}else{//000+10 or 00+1
-				s[j][i]=49;
-			}
-		}
-	}else{	// 010+010
-		if (i==l){	// last digit: *01+1
-			s[j][l]=48;
-			add(l-1,j);
-			return;
-		}else{	// 010+10
-//			s[j][i]=48;
-			add(i+1,j);
-			add(i+2,j);
-		}
-	}
-}
+#define N 102
+
+int flipBit(vector<int> &f, int & strLength,  int bitNum);
+bool getString (vector<int> &f, int &length);
+void printString( vector<int> &f, int &length);
+
+char buff[N];
+
 int main(){
-	int len;
-	while(cin>>s[0]>>s[1]){
-		if (s[0].length()>s[1].length()){
-			len=s[0].length();
-			for (int i=0;i<len;i++){
-				add(i,0);
-			}
-			cout<<s[0]<<"\n";
-		}else{
-			len=s[1].length();
-			for (int i=0;i<len;i++){
-				add(i,1);
-			}
-			cout<<s[1]<<"\n";
-		}
+	bool isLastCase,isFirstCase=true;;                        // detect when last case is read
+
+	while (1){
+            vector<int> f1(N,0);
+            vector<int> f2(N,0);
+            int l1=0,l2=0;
+            isLastCase = getString(f1,l1);
+            if (isLastCase) {
+                break;
+            }
+            
+            if (isLastCase) {
+                break;
+            }
+            
+            getString(f2,l2);
+            for (int i = l1-1; i>=0 ;--i){
+                if (f1[i]) flipBit(f2,l2,i);
+            }
+            
+            if (isFirstCase){
+                isFirstCase = false;
+            } else {
+                cout<<"\n";
+            }
+
+            printString(f2,l2);       
+            
+            getchar();
 	}
+	
+	return 0;
 }
 
+void printString(vector<int>&f, int &length){
+    for (int i = length-1; i>=0;--i){
+        cout<< (int)(f[i]);
+    }
+    cout<<"\n";
+}
 
+bool getString(vector<int>&f, int&length){
+	char c;
+	int i = 0;
 
+	while ( (c=getchar())!=EOF && c!='\n' ){
+		buff[i++]=c;
+	}
 
+	// get new length:
+	length = i;
 
+	int j = 0;
+	
+	while (i--){
+		f[j++] = buff[i]-'0';
+	}
 
+	return (c==EOF);
+}
 
-
-//const int N = 6;
-//const int base = 100000;
-//const int log10 = 5;	// log_10(base);
-//class BigInt {
-//public:
-//	int val[N];
-//	BigInt() :
-//			val() {
-//	}
+int flipBit(vector<int>&f, int & strLength, int bitNum){
+//    printf("bitNum %d, strLength: %d\n",bitNum,strLength);
+//    printf("bitNum: %d\n",bitNum);
+//    printString(f,strLength);
+//    printf("----\n");
 //
-//	BigInt(int i) :
-//			val() {
-//		val[0] = i;
-//	}
-//
-//	void add(BigInt t) {
-//		int c = 0;
-//
-//		for (int j = 0; j < N; j++) {
-//			c += val[j] + t.val[j];
-//			val[j] = c % base;
-//			c /= base;
-//		}
-//	}
-//	void substract(BigInt t) {
-//		int c = 0;
-//
-//		for (int j = 0; j < N; j++) {
-//			c += t.val[j];
-//			if (c <= val[j]) {
-//				val[j] -= c;
-//				c = 0;
-//			} else {
-//				val[j] += base - c;
-//				c = 1;
-//			}
-//		}
-//	}
-//
-////	void print() {
-////		int j = N - 1;
-////		while (!val[j]) {
-////			j--;
-////		}
-////		//j : left most non-zero digit
-////		if (j < 0) {
-////			cout << "0\n";
-////			return;
-////		}
-////		printf("%d", val[j--]);
-////		for (int i = j; i > -1; i--) {
-////			printf("%0*d", log10, val[i]);
-////		}
-////		cout << "\n";
-////	}
-//};
-//bool larger(BigInt i1, BigInt i2) {
-//	//bool r=true;
-//	int n = N - 1;
-//	while (i1.val[n] == i2.val[n]) {
-//		n--;
-//	}
-//	return ((n >= 0) && (i1.val[n] > i2.val[n]));
-//}
-//
-//int main() {
-//	BigInt fibs[103];
-//	fibs[0] = BigInt(1);
-//	fibs[1] = BigInt(2);
-//	for (int i = 2; i < 103; i++) {
-//		fibs[i].add(fibs[i - 1]);
-//		fibs[i].add(fibs[i - 2]);
-//	}
-//
-//	string s;
-//	int l;
-//	bool first = true;
-//	while (cin >> s) {
-//		if (first) {
-//			first = false;
-//		} else {
-//			cout << "\n";
-//		}
-//		BigInt u;
-//
-//		//first Fibinary number
-//		l = s.length() - 1;
-//		for (int i = 0; i <= l; i++) {
-//			if (s[i] == 49) {
-//				u.add(fibs[l - i]);
-//			}
-//		}
-//
-//		// add second fibinary number
-//		cin >> s;
-//		l = s.length() - 1;
-//		for (int i = 0; i <= l; i++) {
-//			if (s[i] == 49) {
-//				u.add(fibs[l - i]);
-//			}
-//		}
-//		l = 103;
-//		while (l--) {
-//			if (!larger(fibs[l], u)) {
-//				break;
-//			}
-//		}
-//		if (l < 0) {
-//			cout << "0\n";
-//		} else {
-//			do {
-//				if (larger(fibs[l], u)) {
-//					cout << "0";
-//				} else {
-//					u.substract(fibs[l]);
-//					cout << "1";
-//				}
-//				l--;
-//			} while (l >= 0);
-//			cout << "\n";
-//		}
-//
-//	}
-//
-//}
-//
+    // edge case
+    if (bitNum >= strLength){
+        if (f[bitNum-1]){
+            f[bitNum-1]=0;
+            f[bitNum+1]=1;
+            strLength = bitNum +2;
+        } else {
+            f[bitNum]=1;
+            strLength = bitNum+1;
+        }
+	return 0;
+    }
+	
+	// recursion:
+	if (f[bitNum]){                         // case 01* + *1*
+            if (bitNum ==0){	// last position
+                f[0]=0; 
+                flipBit(f,strLength,1);
+                return 0;
+            } else if (bitNum==1){
+                f[0]=1;f[1]=0;
+                flipBit(f,strLength,2);
+                return 0;
+            }else{	// bitNum > 1
+                if (bitNum == strLength-1) strLength++;	// if bitNum is at head
+                f[bitNum] = 0;
+                flipBit(f, strLength, bitNum + 1);
+                flipBit(f, strLength, bitNum - 2);
+                return 0;
+            }
+	} else { // f[bitNum]=0
+            if (bitNum == strLength-1){ // case 10 + 0* 
+		if (f[strLength-2]){ // case 10 + 01
+                    f[strLength - 2]=0;
+                    f[strLength++]=1;
+                    return 0;
+		} else {
+                    f[bitNum]=1;
+                    return 0;
+                }
+            } else if (f[bitNum+1]) {
+                f[bitNum+1]=0;
+                flipBit(f,strLength,bitNum+2);
+                return 0;
+            } else if (f[bitNum-1]){
+                f[bitNum-1] = 0;
+                flipBit(f,strLength,bitNum+1);
+                return 0;
+            }
+            else {
+                f[bitNum]=1;
+                return 0;
+            }
+        }
+	
+	return 0;
+}

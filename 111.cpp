@@ -1,52 +1,72 @@
 /*
- * uva111.cpp
+ * =====================================================================================
  *
- *  Created on: May 1, 2015
- *      Author: quanghoang
+ *       Filename:  111.cpp
+ *
+ *    Description:  
+ *
+ *        Version:  1.0
+ *        Created:  08/02/2016 13:55:50
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Quang M. Hoang (QH), quanghm@gmail.com
+ *        Company:  
+ *
+ * =====================================================================================
  */
+#include <cstdio>
 #include <iostream>
 
 using namespace std;
-int main() {
-	int n, t;
-	int c[20]; // orders;
-	int x[20]; // values;
 
-	int L, lo, hi, mid;
-	cin >> n;
+int main(){
+    int n,tmp;
+    cin >> n;
+    int L, lo, hi, mid;
 
-	for (int i = 0; i < n; i++) {
-		cin >> t;
-		c[t] = i;
-	}
-	while (!cin.eof()) {
-		for (int i = 0; i<n; i++) {
-			cin >> x[i];
-			cout<< x[i];
-		}
-		cout<< endl;
-		int m[21] = { }; // indexes
-		L=0;
+    int c[21];
+    int r[20];
 
-		for (int i = 0; i < n; i++) {
-			//binary search for largest j<L: cx[m[j]]<cx[i]
-			lo = 1;
-			hi = L;
-			while (lo <= hi) {
-				mid = lo + hi;
-				mid = (mid % 2) ? (mid / 2 + 1) : (mid / 2);
-				if (c[x[m[i]]] < c[x[i]]) {
-					lo = mid + 1;
-				} else {
-					hi = mid - 1;
-				}
-			}
+    // read the orders
+    for (int i=1;i<=n;++i){
+        cin>>tmp;
+        c[i]=tmp;
+    }
 
-			// lo = length x[i]
-			if (lo>L) L=lo;
-		}
-		cout<< L << endl;
-		if (cin.eof()){break;}
-	}
+    while (1){
+        for (int i = 0; i<n; ++i){
+            cin >>r[i];
+            cout << r[i] << " ";
+        }
 
+        cout << "\n";
+        L = 0;
+
+        int m[21]={}; // indexes
+        for (int i = 0;i <n;i++){
+            lo = 1;
+            hi = L;
+
+            while (lo <= hi){
+                mid = (lo + hi+1)/2;
+                if (r[c[m[mid]]] < r[c[i]]){
+                    lo = mid+1;
+                } else{
+                    hi = mid-1;
+                }
+                cout<< "i:" << i << " --- "  << lo << " " << mid << " "<< hi <<"\n";
+            }
+            
+            m[lo]=i;
+
+            // lo = length r[i]
+            if (lo > L) {
+                L = lo;
+            }
+        }
+
+        cout << L << "\n";
+        if (cin.eof()) break;
+    }
 }

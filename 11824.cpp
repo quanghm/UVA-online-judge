@@ -16,8 +16,10 @@ int main() {
 	bool flag;
 	int p;
 
+	// number of test cases
 	scanf("%d", &c);
 
+	// read through test cases
 	while (c--) {
 		vector<int> lands;
 		while (scanf("%d", &n) != EOF) {
