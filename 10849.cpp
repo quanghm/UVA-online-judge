@@ -35,7 +35,7 @@ int main(){
             diff1 = r1-c1, diff2 = r2-c2;
             if (r1==r2 && c1==c2){
                 cout<<"0\n";
-            } else if (r1+c1==r2+c2 || diff1==diff2 || diff1 == -diff2){
+            } else if (r1+c1==r2+c2 || diff1==diff2){
                 cout<<"1\n";
             } else if ( (diff1&1)==(diff2&1) ){
                 cout<<"2\n";

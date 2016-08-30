@@ -1,52 +1,95 @@
 /*
- * 10000.cpp
+ * =====================================================================================
  *
- *  Created on: Jun 12, 2015
- *      Author: quang
+ *       Filename:  10000.cpp
+ *
+ *    Description:  Longest Path -- DAG
+ *
+ *        Version:  1.0
+ *        Created:  08/27/2016 14:56:18
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Quang Hoang (QH), quanghm@gmail.com
+ *   Organization:  
+ *
+ * =====================================================================================
  */
-#include<cstdio>
-#include<cstring>
-#include<queue>
-#include<vector>
+#include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <utility>
+
+#define inf 1e6
 
 using namespace std;
-const int N = 101;
 
-class compare {
-public:
-	bool operator()(pair<int, int> i, pair<int, int> j) {
-		return (i.first > j.first || (i.first == j.first && i.second < j.second));
-	}
-};
-int main() {
-	int t = 0, n, s, p, q;
-	while (scanf("%d", &n) != EOF && n) {
-		scanf("%d", &s);
-		vector<int> dist(n+1);
-//		bool a[N][N] = { };
-		vector<vector<int> > children(n+1);
-		priority_queue<int, vector<pair<int, int> >, compare> pq;
-		pq.push(pair<int, int>(0, s));
-		while (scanf("%d %d", &p, &q) && p) {
-//			a[p][q] = 1;
-			children[p].push_back(q);
-		}
-		while (!pq.empty()) {
-			p = pq.top().first;	// distant
-			q = pq.top().second; // current node
-			pq.pop();
-//			for (int i = 1; i <= n; i++) {
-//				if (a[q][i]) {
-//					pq.push(pair<int, int>(p + 1, i));
-//				}
-//			}
-			for (vector<int>::iterator it=children[q].begin();it!=children[q].end();it++){
-				pq.push(pair<int,int>(p+1,*it));
-			}
-		}
-		printf(
-				"Case %d: The longest path from %d has length %d, finishing at %d.\n\n",
-				++t, s, p, q);
-	}
+void visit(int i, 
+        vector<bool> &isChecked, 
+        vector<int> &ordered,
+        vector<vector<int> > &children){
+    if (isChecked[i]) return;
+    isChecked[i] = 1;
+
+    for (vector<int>::iterator it = children[i].begin();
+            it!=children[i].end();it++){
+        visit(*it,isChecked,ordered, children);
+    }
+
+    ordered.push_back(i);
 }
 
+int main(){
+    int numNodes, source, n1, n2, t=0, tempDist,maxDist;
+
+    while ( (cin>>numNodes)&& numNodes){
+        cin>>source;
+
+        // reset distFromSource
+        vector<int> distFromSource(numNodes+1,0);
+        vector<bool> isChecked(numNodes+1,0);
+        vector<int> ordered;
+
+        vector<vector<int> > children(numNodes+1);
+
+        // read the line
+        while ( (cin>>n1>>n2) && n1){
+            children[n1].push_back(n2);
+        }
+
+        // surfing through the nodes
+        for (int i = 1;i<=numNodes;i++){
+            visit(i,isChecked,ordered,children);
+        }
+
+        distFromSource[source] = 1;
+        maxDist = 1;
+        n2 = numNodes+1;
+
+        for (vector<int>::reverse_iterator rit = ordered.rbegin();
+                rit !=ordered.rend(); rit++){
+            // cannot go from source to this
+//            cout << "checking "<<*rit<<"\n";
+            if (!distFromSource[*rit]) continue;
+
+            tempDist = distFromSource[*rit];
+            if (tempDist > maxDist || (tempDist == maxDist && *rit<n2)){
+                maxDist = tempDist, n2 = *rit;
+            } 
+//            cout<<"|___distance "<<tempDist<<"\n";
+            tempDist++;
+
+            for (vector<int>::iterator it = children[*rit].begin();
+                    it !=children[*rit].end(); it++){
+                if (distFromSource[*it] < tempDist){
+                    distFromSource[*it]= tempDist;
+                }
+//                cout <<*it<< " ";
+            }
+//            cout<<"\n";
+        }
+        cout<<"Case "<<++t<<": The longest path from "<< source<< 
+            " has length "<<maxDist-1<<", finishing at "<<n2<<".\n\n";
+    }
+}

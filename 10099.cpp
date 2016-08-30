@@ -1,126 +1,106 @@
 /*
- * 10099.cpp
+ * =====================================================================================
  *
- *  Created on: Jun 18, 2015
- *      Author: qhoang
+ *       Filename:  10099.cpp
+ *
+ *    Description:  The Tourist Guide - maximum flow
+ *
+ *        Version:  1.0
+ *        Created:  08/26/2016 15:08:39
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Quang M. Hoang (QH), quanghm@gmail.com
+ *        Company:  
+ *
+ * =====================================================================================
  */
-#include<cstdio>
-#include<cstring>
-#include<vector>
-#include<algorithm>
-#include<queue>
-#include<stack>
-#define N 101
+
+#include<iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+#include <utility>
+
 #define INF 2147483647
 
 using namespace std;
-vector<int> d;
 
-class compare {
-public:
-	bool operator()(int i, int j) {
-		return d[i] < d[j];
-	}
+vector<int> distFromSource;
+
+class compare{
+    public:
+        bool operator()(int i, int j){
+            return distFromSource[i]<distFromSource[j];
+        }
 };
 
-// // naive approach
-int main() {
-	int n, r;
-	int c = 0, c1, c2, p, S, D, T, temp;
-	while (scanf("%d %d", &n, &r) != EOF && n) {
-		vector<int> edges[N];
-		bool checked[N] = { };
-		int e[N][N] = { };
-		d.resize(n + 1, INF);
-
-		for (int i = 0; i < r; i++) {
-			scanf("%d %d %d", &c1, &c2, &p);
-			edges[c1].push_back(c2);
-			edges[c2].push_back(c1);
-
-			e[c1][c2] = p;
-			e[c2][c1] = p;
-		}
-		scanf("%d %d %d", &S, &D, &T);
-		queue<int> v;
-		priority_queue<int> dist;
-		v.push(S);
-		while (!v.empty()) {
-			c1 = v.front();
-			v.pop();
-			checked[c1] = 1;
-			for (vector<int>::iterator it = edges[c1].begin();
-					it != edges[c1].end(); it++) {
-				if (!checked[*it] && *it != D) {
-					v.push(*it);
-				}
-
-				if (d[c1] > e[c1][*it]) {
-					temp = e[c1][*it];
-				} else {
-					temp = d[c1];
-				}
-				if (d[*it] < temp || d[*it] == INF) {
-					d[*it] = temp;
-				}
-
-				if (*it == D) {
-					dist.push(d[*it]);
-				}
-			}
-		}
-		d[D]--;
-		if (T % d[D]) {
-			T = T / d[D] + 1;
-		} else {
-			T = T / d[D];
-		}
-		printf("Scenario #%d\nMinimun Number of Trips = %d\n\n", ++c, T);
-	}
+bool isCloserToSource(int i, int j){
+    return distFromSource[i] < distFromSource[j];
 }
 
-// dijistra
-//int main() {
-//	int n, r, c1, c2, p,S,D,T,temp;
-//
-//	while (scanf("%d %d", &n, &r) && n) {
-//		d.resize(N, 0);
-//		int e[N][N] = { };
-//		bool checked[N];
-//		vector<int> nb[N];
-//		for (int i = 0; i < r; i++) {
-//			scanf("%d %d %d", &c1, &c2, &p);
-//
-//			nb[c1].push_back(c2);
-//			nb[c2].push_back(c1);
-//			e[c1][c2] = p;
-//			e[c2][c1] = p;
-//		}
-//		scanf("%d %d %d",&S,&D,&T);
-//		priority_queue<int, vector<int>, compare> dist;
-//		priority_queue<int>result;
-//
-//		dist.push(S);
-//
-//		while (!dist.empty()){
-//			c1=dist.top();
-//			dist.pop();
-//			checked[c1]=1;
-//
-//			for (vector<int>::iterator it=nb[c1].begin();it!=nb[c1].end();++it){
-//				if (d[c1]>e[c1][*it]||!d[c1]){
-//					temp=e[c1][*it];
-//				}else{
-//					temp=d[c1];
-//				}
-//				if (temp>d[*it]){
-//					d[*it]=temp;
-//				}
-//				if (!checked[*it]){
-//					dist.push(*it);
-//				}
-//			}
-//		}
-//		printf("%d\n\n",d[D]);
-//	}
-//}
+int main(){
+    int numNodes, numEdges, node1, node2, cap, numRemained, tempNode,tempDist,
+        tempEdge, scenario=1;
+
+    while ( (cin>>numNodes>>numEdges) && numNodes){
+        vector<vector<pair<int, int> > > edges(numNodes+1);
+        vector<bool> isChecked(numNodes+1, 0);
+        distFromSource.clear();
+        distFromSource.resize(numNodes+1,0);
+
+        // nodes to be checked
+        vector<int> toCheck;
+
+        // read the edges
+        for (int i = 1; i<= numEdges; i++){
+            cin >> node1 >> node2 >> cap;
+            edges[node1].push_back(pair<int,int>(node2, cap));
+            edges[node2].push_back(pair<int,int>(node1, cap));
+        }
+
+        // now node1 is source, node2 is target, cap is the flow
+        cin>>node1>>node2>>cap;
+        distFromSource[node1] = INF;
+        //        cout<<"Searching for route "<<node1<<" to "<<node2<<"\n";
+
+        // let us surf the net
+        numRemained = numNodes-1; // number of remaining nodes
+        toCheck.push_back(node1); // queue has one member: the source
+
+        for(;;){
+            if (toCheck.empty()) break;
+            tempNode = toCheck.back();  // largest element
+            toCheck.pop_back(); // erase element out of queue
+
+            if (isChecked[tempNode]) continue;
+
+            isChecked[tempNode] = 1; // mark node as checked
+            numRemained--; // reduce the number of node remaining
+            //            if (!numRemained) break;
+            tempDist= distFromSource[tempNode];
+
+            for (vector<pair<int,int> >::iterator it=edges[tempNode].begin();
+                    it!=edges[tempNode].end(); ++it){
+                if (isChecked[it->first]) continue;
+                if (!distFromSource[it->first]) toCheck.push_back(it->first);
+                tempEdge = (tempDist < it->second)? tempDist : it->second;
+                if (tempEdge > distFromSource[it->first]){
+                    distFromSource[it->first]= tempEdge;
+                }
+            }
+            sort(toCheck.begin(),toCheck.end(),isCloserToSource);
+        }
+
+        tempDist = distFromSource[node2] - 1;
+
+        if (cap % tempDist){
+            tempEdge = cap/tempDist + 1;
+        } else {
+            tempEdge = cap/tempDist;
+        }
+        cout<<"Scenario #"<< scenario++<<"\nMinimum Number of Trips = "
+            <<tempEdge<<"\n\n";
+
+    }
+}
