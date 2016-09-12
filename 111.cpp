@@ -26,47 +26,37 @@ int main(){
     int L, lo, hi, mid;
 
     int c[21];
-    int r[20];
+    int r[21];
+    int lcs[21][21] = {};
+        
 
     // read the orders
     for (int i=1;i<=n;++i){
         cin>>tmp;
-        c[i]=tmp;
+        c[tmp]=i;
     }
 
-    while (1){
-        for (int i = 0; i<n; ++i){
-            cin >>r[i];
-            cout << r[i] << " ";
+
+    for(;;){
+        if (!(cin>>tmp)) break;
+        r[tmp]=1;
+        for (int i = 2; i<=n; ++i){
+            cin >>tmp;
+            r[tmp] = i;
         }
 
-        cout << "\n";
-        L = 0;
-
-        int m[21]={}; // indexes
-        for (int i = 0;i <n;i++){
-            lo = 1;
-            hi = L;
-
-            while (lo <= hi){
-                mid = (lo + hi+1)/2;
-                if (r[c[m[mid]]] < r[c[i]]){
-                    lo = mid+1;
-                } else{
-                    hi = mid-1;
+        for (int i = 1; i<=n; i++){
+            for (int j = 1; j<=n; j++){
+                tmp = (lcs[i-1][j]>lcs[i][j-1])?
+                      lcs[i-1][j]:lcs[i][j-1];
+                if (c[i] == r[j]){
+                    lcs[i][j] = (tmp >lcs[i-1][j-1])?
+                                 tmp : (lcs[i-1][j-1]+1);
+                } else {
+                    lcs[i][j] = tmp;
                 }
-                cout<< "i:" << i << " --- "  << lo << " " << mid << " "<< hi <<"\n";
-            }
-            
-            m[lo]=i;
-
-            // lo = length r[i]
-            if (lo > L) {
-                L = lo;
             }
         }
-
-        cout << L << "\n";
-        if (cin.eof()) break;
+        cout<<lcs[n][n]<<"\n";
     }
 }
